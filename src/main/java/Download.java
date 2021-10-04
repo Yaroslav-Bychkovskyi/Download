@@ -1,6 +1,7 @@
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import org.apache.commons.io.IOUtils;
 
 public class Download {
 
@@ -14,12 +15,11 @@ public class Download {
 
   }
 
-  public byte[] readURL(URL url) {
-    byte[] buffer;
+  public byte[] readURL(URL url) throws IOException {
+
     try {
-      final var inputStream = url.openStream();
-      buffer = new byte[inputStream.available()];
-      inputStream.read(buffer);
+      byte[] buffer = IOUtils.toByteArray(url);
+
       return buffer;
     } catch (Exception ex) {
       System.out.println(ex.getMessage());

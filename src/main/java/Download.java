@@ -1,4 +1,7 @@
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 public class Download {
@@ -12,39 +15,32 @@ public class Download {
 
   }
 
-  public FileInputStream readURL(URL url) throws FileNotFoundException {
-    //String line = " ";
-    int line;
+  public String readURL(URL url) {
+    String line = " ";
     StringBuilder stringBuilder = new StringBuilder();
-
-    FileInputStream fileInputStream = null;
     try {
-      fileInputStream = new FileInputStream(String.valueOf(url));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 
-      while ((line = fileInputStream.read()) != -1) {
+      while ((line = reader.readLine()) != null) {
         System.out.println(line);
         stringBuilder.append(line).append("\n");
 
       }
-      fileInputStream.close();
+      reader.close();
     } catch (Exception ex) {
-      System.out.println(ex.getMessage());
+      System.out.println(ex);
     }
 
 
-    return stringBuilder;
+    return new String(stringBuilder);
   }
 
-  public static void writer(String fileName, FileInputStream s) throws IOException {
+  public static void writer(String fileName, String s) throws IOException {
 
-    try {
-      byte[] buffer = new byte[s.available()];
-      FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-      fileOutputStream.write(buffer);
-      fileOutputStream.close();
-    } catch (Exception ex) {
-      System.out.println(ex.getMessage());
-    }
+    FileWriter fileWriter = new FileWriter(fileName);
+
+    fileWriter.write(s);
+    fileWriter.close();
 
   }
 }

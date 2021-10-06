@@ -24,10 +24,10 @@ public class Download {
       byte[] buffer = IOUtils.toByteArray(url);
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(buffer.length);
 
-      byteArrayOutputStream.write(buffer, 512000,512000);
+
 
       while (byteArrayOutputStream.size() !=-1){
-
+        byteArrayOutputStream.write(buffer, 512000,512000);
       }
 
       return buffer;

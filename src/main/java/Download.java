@@ -3,6 +3,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 
@@ -24,10 +25,19 @@ public class Download {
       byte[] buffer = IOUtils.toByteArray(url);
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(buffer.length);
 
+      int off = 512000;
+      int len = 512000;
+
+      byte [] bufferOutput = new byte[buffer.length];
+
+      while (byteArrayOutputStream.size() != -1) {
+
+        byteArrayOutputStream.write(bufferOutput, off, len);
 
 
-      while (byteArrayOutputStream.size() !=-1){
-        byteArrayOutputStream.write(buffer, 512000,512000);
+        System.out.println("Скачано - " + Arrays.toString(bufferOutput) + " кілобайт");
+
+
       }
 
       return buffer;

@@ -1,6 +1,7 @@
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -8,6 +9,11 @@ import java.util.Arrays;
 import org.apache.commons.io.IOUtils;
 
 public class Download {
+
+  public static final int KB_SIZE = 1024;
+  public static final long MB_SIZE = KB_SIZE * 1024;
+  public static final long GB_SIZE = MB_SIZE * 1024;
+  public static final long TB_SIZE = GB_SIZE * 1024;
 
   public static void main(String[] args) throws IOException {
 
@@ -19,28 +25,31 @@ public class Download {
 
   }
 
-  public byte[] readURL(URL url) throws IOException {
+  public byte[] readURL(URL url) {
 
     try {
-      byte[] buffer = IOUtils.toByteArray(url);
-      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(buffer.length);
-
-      int off = 512000;
-      int len = 512000;
-
-      byte [] bufferOutput = new byte[buffer.length];
-
-      while (byteArrayOutputStream.size() != -1) {
-
-        byteArrayOutputStream.write(bufferOutput, off, len);
+      InputStream buffer = url.openConnection().getInputStream();
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
 
-        System.out.println("Скачано - " + Arrays.toString(bufferOutput) + " кілобайт");
+      int len = 512 * KB_SIZE;
 
+      byte[] bufferOutput = new byte[len];
+      int read = buffer.read(bufferOutput, 0, len);
+      System.out.println("Скачано - " + read + " кілобайт");
 
+      long count = 0;
+
+      while (read != -1) {
+
+        byteArrayOutputStream.write(bufferOutput, 0, read);
+
+        count = count + read;
+        System.out.println("Скачано - " + formatSize(count));
+        read = buffer.read(bufferOutput, 0, len);
       }
 
-      return buffer;
+      return byteArrayOutputStream.toByteArray();
     } catch (Exception ex) {
       System.out.println(ex.getMessage());
       throw new RuntimeException(ex);
@@ -56,5 +65,24 @@ public class Download {
       System.out.println(ex.getMessage());
     }
 
+  }
+
+  public String formatSize(long size) {
+    if (size > KB_SIZE && size < MB_SIZE) {
+      double value = (double) size / KB_SIZE / KB_SIZE;
+      String result = String.format("%.2f", value);
+      return result + " кілобайт";
+    }
+    if (size < GB_SIZE) {
+      double value = (double) size / KB_SIZE / KB_SIZE;
+      String result = String.format("%.2f", value);
+      return result + " мегабайт";
+    }
+    if (size < TB_SIZE) {
+      double value = (double) size / KB_SIZE / KB_SIZE/KB_SIZE;
+      String result = String.format("%.2f", value);
+      return result + " гігабайт";
+    }
+    return size + " байт";
   }
 }

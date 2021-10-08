@@ -3,10 +3,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
 
 public class Download {
 
@@ -25,12 +27,28 @@ public class Download {
 
   }
 
+  private byte[] handleResponse(HttpResponse httpResponse) throws IOException {
+    long size = 0;
+    return readStream(httpResponse.getEntity().getContent(), size);
+  }
+
   public byte[] readURL(URL url) {
+    try (CloseableHttpClient client = HttpClients.createDefault()) {
 
-    try {
-      InputStream buffer = url.openConnection().getInputStream();
+      HttpGet request = new HttpGet(url.toURI());
+
+      return client.execute(request, this::handleResponse);
+
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  public byte[] readStream(InputStream buffer, long size) {
+
+    try  {
+
       ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
 
       int len = 512 * KB_SIZE;
 
@@ -79,7 +97,7 @@ public class Download {
       return result + " мегабайт";
     }
     if (size < TB_SIZE) {
-      double value = (double) size / KB_SIZE / KB_SIZE/KB_SIZE;
+      double value = (double) size / KB_SIZE / KB_SIZE / KB_SIZE;
       String result = String.format("%.2f", value);
       return result + " гігабайт";
     }
